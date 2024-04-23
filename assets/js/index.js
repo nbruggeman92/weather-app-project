@@ -1,29 +1,30 @@
 let searchHistoryForWeather = [];
 const weatherAPIBaseURL = "https://api.openweathermap.org";
 const weatherAPIKey = "fa4071c6fe4cd02980853186625f2fda";
-
 const searchForm = document.querySelector("#search-form");
 const searchInput = document.querySelector("#search-input");
-const todayContainer = document.querySelector("#today-container");
+const todayContainer = document.querySelector("#today");
 const forecastContainer = document.querySelector("#forecast");
 const weatherHistoryContainer = document.querySelector("#weather-history");
+
 const displayCurrentWeather = (city, weatherData) => {
+    
     const date = dayjs().format("M/D/YYYY");
     const tempF = weatherData.main.temp;
     const windMph = weatherData.wind.speed;
     const humidity = weatherData.main.humidity;
     const iconUrl = `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`;
-    const iconDescription = weatherData.weather[0].description || "No description"
+    const iconDescription = weatherData.weather[0].description || "No description";
     
     const card = document.createElement("div");
     const cardBody = document.createElement("div");
-    const heading = documenmt.createElement("h3");
+    const heading = document.createElement("h3");
     const weatherIcon = document.createElement("img");
     const temperatureElement = document.createElement("p");
     const windElement = document.createElement("p");
     const humidityElement = document.createElement("p");
 
-    card.setAttribute("class", "card");
+    card.setAttribute("class", "card bg-dark border-primary text-white");
     cardBody.setAttribute("class", "card-body");
     card.append(cardBody);
 
@@ -45,6 +46,61 @@ const displayCurrentWeather = (city, weatherData) => {
     todayContainer.append(card);
 }
 
+const createForecastCard = (forecastData) => {
+    
+    const iconUrl = `https://openweathermap.org/img/w/${forecastData.weather[0].icon}.png`;
+    const iconDescription = forecastData.weather[0].description || "N/A";
+    const temperature = forecastData.main.temp;
+    const wind = forecastData.wind.speed;
+    const humidity = forecastData.main.humidity;
+    const column = document.createElement("div");
+    const card = document.createElement("div");
+    const cardBody = document.createElement("div");
+    const cardTitle = document.createElement("h5");
+    const weatherIcon = document.createElement("img");
+    const temperatureElement = document.createElement("p");
+    const windElement = document.createElement("p");
+    const humidityElement = document.createElement("p");
+
+    column.append(card);
+    card.append(cardBody);
+    cardBody.append(cardTitle, weatherIcon, temperatureElement, windElement, humidityElement);
+    column.setAttribute("class", "col-md");
+    column.classList.add("five-day-card");
+    card.setAttribute("class", "card bg-primary text-white");
+    cardBody.setAttribute("class", "card-body");
+    cardTitle.setAttribute("class", "card-title");
+    temperatureElement.setAttribute("class", "card-text");
+    windElement.setAttribute("class", "card-text");
+    humidityElement.setAttribute("class", "card-text");
+    forecastContainer.append(column);
+}
+const displayForecast = (weatherData) => {
+    
+    const startDate = dayjs().add(1, "day").startOf("day").unix();
+    const endDate = dayjs().add(6, "day").startOf("day").unix();
+    const headingColumn = document.createElement("div");
+    const heading = document.createElement("h3");
+    
+    headingColumn.setAttribute("class", "col-12");
+    heading.textContent = "5-day Forecast:";
+    headingColumn.append(heading);
+
+    forecastContainer.innerHTML = "";
+    
+    forecastContainer.append(headingColumn);
+        
+    console.log(weatherData.list.length);
+
+        for(let index = 0; index < weatherData.length; index++) {
+            console.log(weatherData.list[index])
+                if(weatherData.list[index].dt >= startDate && weatherData.list[index].dt < endDate) {
+                if(weatherData.list[index].dt_txt.slice(11,13) === "12") {
+                }
+            }
+        }
+}
+
 const fetchWeather = (location) => {
     const latitude = location.lat;
     const longitude = location.lon;
@@ -57,8 +113,8 @@ const fetchWeather = (location) => {
         console.log(data);
         
         displayCurrentWeather(city, data.list[0])
-        // displayForecast(data);
     }).catch(function(error){
+        console.log(error);
     })
 }
 
@@ -126,7 +182,6 @@ const initializeSearchHistory = () => {
 }
 
 const handleSearchHistoryClick = (event) => {
-    console.log(event.target)
     if(!event.target.matches(".history-button")){
         return;
     }
